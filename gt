@@ -1,0 +1,62 @@
+#include "monty.h"
+/**
+ * getline - Read a line from a file.
+ * @lineptr: Pointer to the buffer storing the read line.
+ * @n: Pointer to the size of the buffer.
+ * @stream: File stream to read from.
+ *
+ * Return: The number of characters read, or -1 on failure or end of file.
+ */
+ssize_t getline(char **lineptr, size_t *n, FILE *stream)
+{
+	size_t bufsize = 0;
+	ssize_t chars_read = 0;
+	int c;
+
+	if (lineptr == NULL || n == NULL || stream == NULL)
+	{
+		return (-1);
+	}
+
+	if (*lineptr == NULL || *n == 0)
+	{
+		bufsize = 128;
+		*lineptr = (char *)malloc(bufsize);
+		if (*lineptr == NULL)
+		{
+			return (-1);
+		}
+		*n = bufsize;
+	}
+
+	while ((c = getc(stream)) != EOF)
+	{
+		if (chars_read >= *n - 1)
+		{
+			bufsize *= 2;
+			char *newptr = (char *)realloc(*lineptr, bufsize);
+			if (newptr == NULL)
+			{
+				return (-1);
+			}
+			*lineptr = newptr;
+			*n = bufsize;
+		}
+		(*lineptr)[chars_read++] = (char)c;
+
+		if (c == '\n')
+		{
+			break;
+		}
+	}
+
+	if (chars_read == 0)
+	{
+		return (-1);
+	}
+
+	(*lineptr)[chars_read] = '\0';
+
+	return (chars_read);
+}
+
